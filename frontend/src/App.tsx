@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router';
+import { RegisterForm } from '@/pages/RegisterForm';
+import { HomePage } from './pages/HomePage';
 
-export default function App() {
+export function App() {
+
   return (
-    <div>
-      <form>
-        <input type="email" />
-        <input type="password" />
-        <button type='submit'></button>
-      </form>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path='/' element={<HomePage />} />
+        <Route path='/register' element={<RegisterForm />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
