@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router';
-import { RegisterForm } from '@/pages/RegisterForm';
+import RegisterForm from '@/pages/RegisterForm';
 import { HomePage } from './pages/HomePage';
 
 export function App() {
