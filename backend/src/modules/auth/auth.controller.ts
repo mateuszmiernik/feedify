@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import prisma from '../../prisma.js';
+import { prisma } from '../../prisma.js';
 import { registerSchema } from './auth.schemas.js'; 
 import { hashPassword } from '../../utils/password.js';
 
