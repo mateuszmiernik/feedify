@@ -1,0 +1,107 @@
+@baseUrl = http://localhost:4000/api
+
+
+### 1. Zarejestruj nowego użytkownika (Sukces -> 201)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "jan@example.com",
+  "password": "supertajnehaslo1",
+  "confirmPassword": "supertajnehaslo1"
+}
+
+### 2. Zaloguj się i automatycznie przechwyć token (Sukces -> 200)
+# @name loginRequest
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "jan@example.com",
+  "password": "supertajnehaslo1"
+}
+
+### Zapisujemy token ze zwróconego JSON-a do zmiennej dynamicznej
+@authToken = {{loginRequest.response.body.token}}
+
+
+### 3. Pobierz profil z poprawnym tokenem (Sukces -> 200)
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{authToken}}
+
+
+### 4. Pobierz profil bez tokena (Błąd -> 401)
+GET {{baseUrl}}/auth/me
+
+
+### 5. Pobierz profil ze złym tokenem (Błąd -> 401)
+GET {{baseUrl}}/auth/me
+Authorization: Bearer a.b.c
+
+
+### 6. Logowanie ze złym hasłem (Błąd -> 401)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "jan@example.com",
+  "password": "zlehaslo123"
+}
+
+### 7. Rejestracja: Różne hasła (Błąd walidacji)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "nowy@example.com",
+  "password": "supertajnehaslo1",
+  "confirmPassword": "INNEhaslo123"
+}
+
+### 8. Rejestracja: Niepoprawny format e-mail
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "zly-email-bez-malpy.com",
+  "password": "supertajnehaslo1",
+  "confirmPassword": "supertajnehaslo1"
+}
+
+### 9. Rejestracja: Za krótkie hasło
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "jan2@example.com",
+  "password": "123",
+  "confirmPassword": "123"
+}
+
+### 10. Rejestracja istniejącego e-maila (Conflict)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "jan@example.com",
+  "password": "supertajnehaslo1",
+  "confirmPassword": "supertajnehaslo1"
+}
+
+### 11. Logowanie: Puste hasło i zły format e-mail
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "nie-mail",
+  "password": ""
+}
+
+### 12. Logowanie: Użytkownik nie istnieje w bazie
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "duch@example.com",
+  "password": "jakiekolwiekHaslo"
+}

@@ -11,3 +11,10 @@ export const registerSchema = z.object({
     });
 
 export type RegisterInput = z.input<typeof registerSchema>;
+
+export const loginSchema = z.object({
+    email: z.string().email('Enter a valid email address.'),
+    password: z.string().min(1, 'Password must be at least 8 characters.')
+})
+
+export type LoginInput = z.input<typeof loginSchema>;

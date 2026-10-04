@@ -1,7 +1,7 @@
 import { Link } from 'react-router';
 import { buttonVariants } from '@/components/ui/button';
 
-export function HomePage() {
+export default function HomePage() {
     const features = [
         {
             title: 'One API for everything',
@@ -26,7 +26,7 @@ export function HomePage() {
                     </Link>
 
                     <nav className='flex items-center gap-2'>
-                        <Link to='/' className={buttonVariants({ variant: "ghost" })}>
+                        <Link to='/login' className={buttonVariants({ variant: "ghost" })}>
                             Log In
                         </Link>
                         <Link to='/register' className={buttonVariants()}>

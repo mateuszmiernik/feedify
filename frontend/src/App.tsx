@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router';
 import RegisterForm from '@/pages/RegisterForm';
-import { HomePage } from './pages/HomePage';
+import HomePage from './pages/HomePage';
+import LoginPage from './pages/LoginPage';
 
 export function App() {
 
@@ -9,6 +10,7 @@ export function App() {
       <Routes>
         <Route path='/' element={<HomePage />} />
         <Route path='/register' element={<RegisterForm />} />
+        <Route path='/login' element={<LoginPage />} />
       </Routes>
     </BrowserRouter>
   )

@@ -32,12 +32,12 @@ export default function RegisterForm() {
     const result = registerSchema.safeParse({ email, password, confirmPassword });
 
     if (!result.success) {
-      const formattedErrors: typeof fieldErrors = {};
+      const formattedErrors: Record<string, string> = {};
 
       for (const issue of result.error.issues) {
         const fieldName = issue.path[0];
         if (fieldName) {
-          formattedErrors[String(fieldName) as keyof typeof fieldErrors] = issue.message;
+          formattedErrors[String(fieldName)] = issue.message;
         }
       }
 

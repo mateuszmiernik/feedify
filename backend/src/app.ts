@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import { omit } from 'zod/mini';
 import { authRouter } from './modules/auth/auth.routes.js';
 
 export const app = express();
