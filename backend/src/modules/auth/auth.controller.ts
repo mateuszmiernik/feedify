@@ -42,7 +42,7 @@ export async function register(req: Request, res: Response): Promise<void> {
 export async function login(req: Request, res: Response): Promise<void> {
     const result = loginSchema.safeParse(req.body);
 
-    console.log(req.body)
+    // console.log(req.body)
 
     if (!result.success) {
         res.status(422).json({ message: result.error.issues[0]?.message ?? 'Invalid input.' });
@@ -68,7 +68,7 @@ export async function login(req: Request, res: Response): Promise<void> {
     res.json({ token });
 }
 
-export async function me(req: Request, res: Response): Promise<void> {
+export async function me(req: Request, res: Response): Promise<void> {        
         if (!req.userId) {
             res.status(401).json({ message: 'Not authenticated.' });
             return;

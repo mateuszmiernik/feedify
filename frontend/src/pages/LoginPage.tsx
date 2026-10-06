@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { loginSchema } from '@/schemas/auth';
+import { saveToken, clearToken } from '@/lib/token';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
@@ -59,15 +60,36 @@ export default function LoginPage() {
                 return;
             }
 
+            // console.log(data);
+
+            saveToken(data.token)
+
+            const meResponse = await fetch('/api/auth/me', {
+                headers: {
+                    Authorization: `Bearer ${data.token}`
+                }
+            });
+
+            if (!meResponse.ok) {
+                clearToken();
+                setError('Token was rejected by the server.')
+                setPending(false);
+                return;
+            }
+
+            const me = await meResponse.json();
+
             setEmail('');
             setPassword('');
-            setLoggedInAs(data.email);
+            setLoggedInAs(me.email);
             setPending(false);
-
         } catch (err) {
             setError('Cannot reach the server.')
+            setPending(false);
         }
-
+        finally {
+            setPending(false);
+        }
     }
 
 
