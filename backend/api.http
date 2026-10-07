@@ -105,3 +105,38 @@ Content-Type: application/json
   "email": "duch@example.com",
   "password": "jakiekolwiekHaslo"
 }
+
+### 13. Reset hasła: prośba o link (zawsze 200, nawet dla nieistniejącego maila)
+POST {{baseUrl}}/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "jan@example.com"
+}
+
+### 14. Reset hasła: zły token (Błąd -> 400)
+POST {{baseUrl}}/auth/reset-password
+Content-Type: application/json
+
+{
+  "token": "to-nie-jest-prawdziwy-token",
+  "password": "noweHaslo12345"
+}
+
+### 15. Reset hasła: za krótkie hasło (Błąd -> 422)
+POST {{baseUrl}}/auth/reset-password
+Content-Type: application/json
+
+{
+  "token": "cokolwiek",
+  "password": "123"
+}
+
+### 16. Logowanie nowym hasłem po resecie
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "jan@example.com",
+  "password": "noweHaslo12345"
+}

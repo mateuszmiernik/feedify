@@ -1,8 +1,11 @@
 import type { Request, Response } from 'express';
 import { prisma } from '../../prisma.js';
-import { registerSchema, loginSchema } from './auth.schemas.js';
+import { registerSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema } from './auth.schemas.js';
 import { comparePassword, hashPassword } from '../../utils/password.js';
 import { signAccessToken } from '../../utils/jwt.js';
+import { generateResetToken, hashResetToken } from '../../utils/token.js';
+
+const RESET_TOKEN_TTL_MINUTES = 30;
 
 
 export async function register(req: Request, res: Response): Promise<void> {
@@ -84,4 +87,38 @@ export async function me(req: Request, res: Response): Promise<void> {
             return;
         }
         res.json(user);
+}
+
+export async function forgotPassword(req: Request, res: Response): Promise<void> {
+    const result = forgotPasswordSchema.safeParse(req.body);
+
+    if(!result.success) {
+        res.status(422).json({ message: result.error.issues[0]?.message ?? 'Invalid input.' });
+        return;
     }
+
+    const email = result.data.email.toLowerCase();
+    const user = await prisma.user.findUnique({ where: { email }});
+
+    if (user) {
+        await prisma.passwordResetToken.deleteMany({
+            where: { userId: user.id }
+        });
+    }
+
+    const token = generateResetToken();
+
+    await prisma.passwordResetToken.create({
+        data: {
+            tokenHash: hashResetToken(token),
+            expiresAt: new Date(Date.now() + RESET_TOKEN_TTL_MINUTES * 60 * 1000),
+            userId: user.id
+        }
+    });
+
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+
+    console.log(`Link to reset pw: ${email}: ${resetLink}`);
+    
+    res.json({ message: 'If an account with that email exists, a reset link has been sent.' });
+}
