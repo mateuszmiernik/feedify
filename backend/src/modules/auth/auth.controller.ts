@@ -122,3 +122,42 @@ export async function forgotPassword(req: Request, res: Response): Promise<void>
     
     res.json({ message: 'If an account with that email exists, a reset link has been sent.' });
 }
+
+export async function resetPassword(req: Request, res: Response): Promise<void> {
+    const result = resetPasswordSchema.safeParse(req.body);
+
+    if (!result.success) {
+        res.status(422).json({ message: result.error.issues[0]?.message ?? 'Invalid input.' });
+        return;
+    }
+
+    const tokenHash = hashResetToken(result.data.token);
+
+    const resetToken = await prisma.passwordResetToken.findUnique({
+        where: { tokenHash}
+    });
+
+    if (!resetToken || resetToken.expiresAt < new Date()) {
+        await prisma.passwordResetToken.delete({ where: {
+            id: resetToken.id
+        }});
+
+        res.status(400).json({ message: 'This reset link is invalid or has expired.' });
+        return;
+    }
+
+    const passwordHash = await hashPassword(result.data.password);
+
+    await prisma.$transaction([
+        prisma.user.update({
+            where: { id: resetToken.userId },
+            data: { password: passwordHash }
+        }),
+
+        prisma.passwordResetToken.deleteMany({
+            where: { userId: resetToken.userId }
+        })
+    ]);
+
+    res.json({ message: 'Password has been reset. You can log in now.' });
+}

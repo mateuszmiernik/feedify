@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { login, register, me, forgotPassword } from './auth.controller.js';
+import { login, register, me, forgotPassword, resetPassword } from './auth.controller.js';
 import { requireAuth } from '../../middlewares/require-auth.js';
 
 
@@ -10,3 +10,4 @@ authRouter.post('/login', login);
 authRouter.get('/me', requireAuth, me);
 
 authRouter.post('/forgot-password', forgotPassword);
+authRouter.post('/reset-password', resetPassword);
