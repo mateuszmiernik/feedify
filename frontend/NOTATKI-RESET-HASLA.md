@@ -952,3 +952,57 @@ Mentor napisał: *„Nie musisz robić wysyłania maila"* — więc ten etap mo�
 Kolejny etap to **sesja i ochrona tras**: wspólny `apiFetch` (żeby nie powtarzać `fetch` z nagłówkiem `Authorization` w każdym komponencie), `AuthContext` (jedno miejsce, które wie, kto jest zalogowany), `ProtectedRoute` (blokada `/dashboard` dla niezalogowanych) i sam dashboard. Wtedy część kodu, który dziś żyje w `LoginPage`, przeniesie się „piętro wyżej" — i to jest normalne, tak się kod rozwija.
 
 **Zanim tam pójdziemy:** domknij checklistę powyżej i zdaj mi relację — szczególnie z Testu 3 (jednakowe komunikaty), Testu 6 (jednorazowość) i Testu 9 (hash w bazie). To są trzy miejsca, w których najczęściej coś umyka i które mentor sprawdzi w pierwszej kolejności.
+
+rzypomnijmy sobie, w którym miejscu jesteśmy. Budujemy teraz Etap Resetowania Hasła.
+To proces składający się z dwóch osobnych kroków na frontendzie i dwóch akcji na backendzie.
+Oto dokładny, czysty schemat blokowy pokazujący strukturę obiektów, bazy danych oraz plików, które musimy teraz po kolei stworzyć lub zaktualizować.
+
+🗺️ SCHEMAT PRZEPŁYWU DANYCH DLA RESETU HASŁA
+
+text
+==================================================================================================
+[ CZĘŚĆ A: PROŚBA O RESET (Forgot Password) ]
+==================================================================================================
+
+ 1. [FRONTEND] Strona: ForgotPasswordPage.tsx
+    - Użytkownik wpisuje swój e-mail i klika "Wyślij link".
+    - React wysyła paczkę przez sieć -------------( POST /api/auth/forgot-password )-->
+                                                  [ body: { email: "jan@test.pl" } ]
+                                                                                          |
+ 2. [BACKEND] Plik: src/modules/auth/auth.controller.ts -> Funkcja: forgotPassword       |
+    - Serwer sprawdza maila Zodem i szuka go w Prismie.                                   |
+    - Jeśli użytkownik istnieje, serwer robi 3 rzeczy w pamięci:                          |
+      a) Generuje surowy, losowy token (np. "token_xyz123").                              |
+      b) Szyfruje go szybkim algorytmem SHA-256 do postaci hasha (np. "hash_abc999").     |
+      c) Ustala czas wygaśnięcia: Date.now() + 30 * 60 * 1000 (za 30 minut).              |
+    - 🌟 ZAPIS DO BAZY: Serwer aktualizuje rekord w bazie Prisma:                         |
+      data: { resetToken: "hash_abc999", resetTokenExp: "za 30 minut" }                   |
+    - Serwer wypisuje w konsoli link zawierający SUROWY token:                            |
+      `http://localhost:3000/reset-password?token=token_xyz123`                           |
+    - Serwer odsyła odpowiedź (sukces) do przeglądarki <----------------------------------'
+
+
+==================================================================================================
+[ CZĘŚĆ B: USTAWIENIE NOWEGO HASŁA (Reset Password) ]
+==================================================================================================
+
+ 3. [FRONTEND] Strona: ResetPasswordPage.tsx
+    - Użytkownik klika w link z konsoli/maila. Otwiera się strona resetu hasła.
+    - React automatycznie wyciąga z paska adresu SUROWY token: "token_xyz123".
+    - Użytkownik wpisuje nowe hasło i klika "Zmień hasło".
+    - React wysyła przez sieć paczkę --------------( POST /api/auth/reset-password )--->
+                                                   [ body: { token: "token_xyz123", ]     |
+                                                   [         password: "noweHaslo" } ]    |
+                                                                                          |
+ 4. [BACKEND] Plik: src/modules/auth/auth.controller.ts -> Funkcja: resetPassword         |
+    - Serwer odbiera surowy "token_xyz123" z req.body.                                    |
+    - 🌟 KLUCZOWY MOMENT: Serwer zamienia go na hash SHA-256 -> "hash_abc999".            |
+    - Serwer pyta Prismę: *"Daj mi użytkownika, który ma w bazie dokładnie ten hash"*!    |
+    - Gdy go znajdzie, serwer sprawdza czas: *"Czy resetTokenExp jest większy niż teraz?"*|
+    - Jeśli czas jest OK:                                                                 |
+      a) Szyfruje nowe hasło powolnym bcryptem.                                           |
+      b) Zapisuje nowe hasło w bazie Prisma.                                              |
+      c) 🌟 CZYŚCI BAZĘ: Ustawia resetToken: null oraz resetTokenExp: null (żeton zużyty). |
+    - Serwer odsyła odpowiedź o sukcesie do przeglądarki <--------------------------------'
+                               |
+ 5. [FRONTEND] React odbiera sukces i pokazuje komunikat: "Hasło zostało zmienion
