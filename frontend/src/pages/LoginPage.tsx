@@ -167,11 +167,17 @@ export default function LoginPage() {
                     </form>
                 </CardContent>
 
-                <CardFooter className="justify-center pt-0 text-sm text-muted-foreground">
-                    Don't have an account?
-                    <Link to="/register" className="ml-1 underline underline-offset-4 hover:text-primary">
-                        Sign up
+                <CardFooter className="flex-col gap-2 justify-center pt-0 text-sm text-muted-foreground">
+                    <Link to="/forgot-password" className="underline underline-offset-4 hover:text-primary">
+                        Forgot your password?
                     </Link>
+
+                    <div>
+                        Don't have an account?
+                        <Link to="/register" className="ml-1 underline underline-offset-4 hover:text-primary">
+                            Sign up
+                        </Link>
+                    </div>
                 </CardFooter>
             </Card>
         </div>
