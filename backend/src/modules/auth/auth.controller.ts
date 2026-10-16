@@ -71,55 +71,54 @@ export async function login(req: Request, res: Response): Promise<void> {
     res.json({ token });
 }
 
-export async function me(req: Request, res: Response): Promise<void> {        
-        if (!req.userId) {
-            res.status(401).json({ message: 'Not authenticated.' });
-            return;
-        }
+export async function me(req: Request, res: Response): Promise<void> {
+    if (!req.userId) {
+        res.status(401).json({ message: 'Not authenticated.' });
+        return;
+    }
 
-        const user = await prisma.user.findUnique({
-            where: { id: req.userId},
-            select: { id: true, email: true, createdAt: true }
-        });
+    const user = await prisma.user.findUnique({
+        where: { id: req.userId },
+        select: { id: true, email: true, createdAt: true }
+    });
 
-        if (!user) {
-            res.status(404).json({ message: 'User not found.' });
-            return;
-        }
-        res.json(user);
+    if (!user) {
+        res.status(404).json({ message: 'User not found.' });
+        return;
+    }
+    res.json(user);
 }
 
 export async function forgotPassword(req: Request, res: Response): Promise<void> {
     const result = forgotPasswordSchema.safeParse(req.body);
 
-    if(!result.success) {
+    if (!result.success) {
         res.status(422).json({ message: result.error.issues[0]?.message ?? 'Invalid input.' });
         return;
     }
 
     const email = result.data.email.toLowerCase();
-    const user = await prisma.user.findUnique({ where: { email }});
+    const user = await prisma.user.findUnique({ where: { email } });
 
     if (user) {
         await prisma.passwordResetToken.deleteMany({
             where: { userId: user.id }
         });
+
+        const token = generateResetToken();
+
+        await prisma.passwordResetToken.create({
+            data: {
+                tokenHash: hashResetToken(token),
+                expiresAt: new Date(Date.now() + RESET_TOKEN_TTL_MINUTES * 60 * 1000),
+                userId: user.id
+            }
+        });
+
+        const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+        console.log(`Link to reset pw: ${email}: ${resetLink}`);
     }
 
-    const token = generateResetToken();
-
-    await prisma.passwordResetToken.create({
-        data: {
-            tokenHash: hashResetToken(token),
-            expiresAt: new Date(Date.now() + RESET_TOKEN_TTL_MINUTES * 60 * 1000),
-            userId: user.id
-        }
-    });
-
-    const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
-
-    console.log(`Link to reset pw: ${email}: ${resetLink}`);
-    
     res.json({ message: 'If an account with that email exists, a reset link has been sent.' });
 }
 
@@ -134,13 +133,13 @@ export async function resetPassword(req: Request, res: Response): Promise<void> 
     const tokenHash = hashResetToken(result.data.token);
 
     const resetToken = await prisma.passwordResetToken.findUnique({
-        where: { tokenHash}
+        where: { tokenHash }
     });
 
     if (!resetToken || resetToken.expiresAt < new Date()) {
-        await prisma.passwordResetToken.delete({ where: {
-            id: resetToken.id
-        }});
+        if (resetToken) {
+            await prisma.passwordResetToken.delete({ where: { id: resetToken.id } });
+        }
 
         res.status(400).json({ message: 'This reset link is invalid or has expired.' });
         return;
