@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { IconArrowLeft } from '@tabler/icons-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -66,6 +67,10 @@ export default function ResetPasswordPage() {
 
     return (
         <div className='flex min-h-screen items-center justify-center bg-background p-4'>
+            <Link to='/' className={buttonVariants({ variant: 'ghost', size: 'sm' })}>
+                <IconArrowLeft />
+                Back to home
+            </Link>
             <Card className="w-full max-w-md shadow-2xl">
                 <CardHeader className="space-y-1 text-center">
                     <CardTitle className="text-2xl font-bold tracking-tight">

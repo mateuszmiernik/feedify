@@ -1,4 +1,5 @@
 import type { Request, Response } from 'express';
+import { env } from '../../config/env.js'
 import { prisma } from '../../prisma.js';
 import { registerSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema } from './auth.schemas.js';
 import { comparePassword, hashPassword } from '../../utils/password.js';
@@ -10,7 +11,7 @@ const RESET_TOKEN_TTL_MINUTES = 30;
 
 export async function register(req: Request, res: Response): Promise<void> {
     const result = registerSchema.safeParse(req.body);
-    console.log(result);
+    // console.log(result);
 
     if (!result.success) {
         res.status(422).json({ message: result.error.issues[0]?.message ?? 'Invalid input.' });
@@ -115,7 +116,7 @@ export async function forgotPassword(req: Request, res: Response): Promise<void>
             }
         });
 
-        const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+        const resetLink = `${env.FRONTEND_URL}/reset-password?token=${token}`;
         console.log(`Link to reset pw: ${email}: ${resetLink}`);
     }
 
