@@ -19,6 +19,7 @@ model User {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   tokens  PasswordResetToken[]
+  projects Project[]
 }
 
 model PasswordResetToken {
@@ -28,4 +29,14 @@ model PasswordResetToken {
   createdAt DateTime  @default(now())
   userId   String
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Project {
+  id String @id @default(uuid())
+  project String
+  website String?
+  description String?
+  createdAt DateTime  @default(now())
+  userId  String
+  user  User  @relation(fields: [userId], references: [id], onDelete: Restrict)
 }

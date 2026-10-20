@@ -28,3 +28,27 @@ export const resetPasswordSchema = z.object({
 });
 
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
+
+function emptyStringToUndefined(value: unknown): unknown {
+    if (typeof value === 'string' && value.trim() === '') {
+        return undefined;
+    }
+    return value;
+}
+
+export const createProjectSchema = z.strictObject({
+    name: z.string()
+        .trim()
+        .min(1, 'Project name is required.')
+        .max(100, 'Project name must be at most 100 characters.')
+
+     website: z.preprocess(
+        emptyStringToUndefined,
+        z.string()
+            .trim()
+            .max(2048, 'Website must be at most 2048 characters.')
+            .pipe(z.url({ protocol: /^https?$/ }))
+            .optional()
+    ).transform((value) => value ?? null),
+
+})
