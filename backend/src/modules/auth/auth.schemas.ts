@@ -46,9 +46,18 @@ export const createProjectSchema = z.strictObject({
         emptyStringToUndefined,
         z.string()
             .trim()
-            .max(2048, 'Website must be at most 2048 characters.')
+            .max(100, 'Website must be at most 2048 characters.')
             .pipe(z.url({ protocol: /^https?$/ }))
             .optional()
     ).transform((value) => value ?? null),
 
+    description: z.preprocess(
+        emptyStringToUndefined,
+        z.string()
+            .trim()
+            .max(2000, 'Description must be at most 2000 characters.')
+            .optional()
+    ).transform((value) => value ?? null)
 })
+
+export type CreateProjectInput = z.infer<typeof createProjectSchema>;
