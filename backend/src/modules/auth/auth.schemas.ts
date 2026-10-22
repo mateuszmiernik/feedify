@@ -40,9 +40,9 @@ export const createProjectSchema = z.strictObject({
     name: z.string()
         .trim()
         .min(1, 'Project name is required.')
-        .max(100, 'Project name must be at most 100 characters.')
+        .max(100, 'Project name must be at most 100 characters.'),
 
-     website: z.preprocess(
+    website: z.preprocess(
         emptyStringToUndefined,
         z.string()
             .trim()

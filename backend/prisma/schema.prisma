@@ -33,10 +33,11 @@ model PasswordResetToken {
 
 model Project {
   id String @id @default(uuid())
-  project String
+  name String
   website String?
   description String?
   createdAt DateTime  @default(now())
   userId  String
   user  User  @relation(fields: [userId], references: [id], onDelete: Restrict)
+  @@index([userId])
 }
