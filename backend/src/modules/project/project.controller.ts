@@ -26,6 +26,31 @@ export async function createProject (req: Request, res: Response): Promise<void>
             res.status(401).json({ message: 'Not authenticated. '});
             return;
         }
-    }
 
+        const saved = await prisma.project.create({
+            data: {
+                name: result.data.name,
+                website: result.data?.website,
+                description: result.data?.description,
+                userId: owner.id
+            },
+            select: {
+                id: true,
+                project: true,
+                website: true,
+                description: true,
+                createdAt: true
+            }
+        });
+
+        res.status(201).json({
+            id: saved.id,
+            name: saved.name,
+            website: saved.website,
+            description: saved.description,
+            createdAt: saved.createdAt
+        });
+    } catch {
+        res.status(500).json({ message: 'Could not create project.' });
+    }
 }

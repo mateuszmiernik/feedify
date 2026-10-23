@@ -140,3 +140,72 @@ Content-Type: application/json
   "email": "jan@example.com",
   "password": "noweHaslo12345"
 }
+
+```http
+### Projekt: poprawne dane → 201
+POST {{baseUrl}}/project
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "  Mój sklep  ",
+  "website": "https://example.com",
+  "description": "  Feedback od klientów  "
+}
+
+### Projekt: tylko nazwa → 201, opcjonalne pola null
+POST {{baseUrl}}/project
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Drugi projekt"
+}
+
+### Projekt: brak JWT → 401
+POST {{baseUrl}}/project
+Content-Type: application/json
+
+{
+  "name": "Nie powinien powstać"
+}
+
+### Projekt: niepoprawny JWT → 401
+POST {{baseUrl}}/project
+Authorization: Bearer niepoprawny-token
+Content-Type: application/json
+
+{
+  "name": "Nie powinien powstać"
+}
+
+### Projekt: pusta nazwa → 422
+POST {{baseUrl}}/project
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "   "
+}
+
+### Projekt: niedozwolony protokół → 422
+POST {{baseUrl}}/project
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Sklep",
+  "website": "javascript:alert(1)"
+}
+
+### Projekt: narzucony właściciel → 422, bez zapisu
+POST {{baseUrl}}/project
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Próba podmiany",
+  "userId": "cudzy-identyfikator"
+}
+```
+

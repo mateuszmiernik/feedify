@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import { authRouter } from './modules/auth/auth.routes.js';
+import { projectRouter } from './modules/project/project.routes.js';
 import { env } from './config/env.js';
 
 export const app = express();
@@ -18,6 +19,7 @@ app.use(
 app.use(express.json());
 
 app.use('/api/auth', authRouter);
+app.use('/api/project', projectRouter);
 
 app.get('/api/health', (req, res) => {
     res.json({ status: 'OK', message: 'Health Check' });
