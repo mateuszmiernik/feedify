@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
-import { createProjectSchema } from '../auth/auth.schemas.js';
 import { prisma } from '../../prisma.js';
+import { createProjectSchema } from '../auth/auth.schemas.js';
 
 export async function createProject (req: Request, res: Response): Promise<void> {
     if (!req.userId) {
@@ -13,7 +13,8 @@ export async function createProject (req: Request, res: Response): Promise<void>
     if (!result.success) {
         res.status(422).json({ 
             message: result.error.issues[0]?.message ?? 'Invalid input.'
-        })
+        });
+        return;
     }
 
     try {
@@ -36,7 +37,7 @@ export async function createProject (req: Request, res: Response): Promise<void>
             },
             select: {
                 id: true,
-                project: true,
+                name: true,
                 website: true,
                 description: true,
                 createdAt: true

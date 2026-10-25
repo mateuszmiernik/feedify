@@ -133,6 +133,10 @@ export default function LoginPage() {
                         </div>
                     )}
 
+                    <Link to='/projects/new' className={buttonVariants({ variant: 'outline', size: 'sm' })}>
+                        Create project
+                    </Link>
+
                     <form onSubmit={handleSubmit} noValidate className='space-y-4'>
                         <div className='space-y-2'>
                             <Label htmlFor="email" className='text-sm font-medium'>Email address</Label>

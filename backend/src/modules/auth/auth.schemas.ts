@@ -46,7 +46,7 @@ export const createProjectSchema = z.strictObject({
         emptyStringToUndefined,
         z.string()
             .trim()
-            .max(100, 'Website must be at most 2048 characters.')
+            .max(100, 'Website must be at most 100 characters.')
             .pipe(z.url({ protocol: /^https?$/ }))
             .optional()
     ).transform((value) => value ?? null),
