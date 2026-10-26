@@ -39,5 +39,17 @@ model Project {
   createdAt DateTime  @default(now())
   userId  String
   user  User  @relation(fields: [userId], references: [id], onDelete: Restrict)
+  keys  ApiKey[]
   @@index([userId])
+}
+
+model ApiKey {
+  id  String @id @default(uuid())
+  keyHash String  @unique
+  createdAt DateTime  @default(now())
+
+  projectId String
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
 }

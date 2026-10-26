@@ -51,7 +51,8 @@ export async function createProject (req: Request, res: Response): Promise<void>
             description: saved.description,
             createdAt: saved.createdAt
         });
-    } catch {
+    } catch (error) {
+        console.error("error: ", error); 
         res.status(500).json({ message: 'Could not create project.' });
     }
 }

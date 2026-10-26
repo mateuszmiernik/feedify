@@ -4,7 +4,8 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import type { CreatedProject } from '@/schemas/project';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { errorResponseSchema, projectFormSchema, createdProjectSchema } from '@/schemas/project';
 import { getToken, clearToken } from '@/lib/token';
 
