@@ -40,6 +40,7 @@ model Project {
   userId  String
   user  User  @relation(fields: [userId], references: [id], onDelete: Restrict)
   keys  ApiKey[]
+  feedbacks Feedback[]
   @@index([userId])
 }
 
@@ -50,6 +51,24 @@ model ApiKey {
 
   projectId String
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+enum FeedbackType {
+  idea
+  bug
+  other
+}
+
+model Feedback {
+  id  String  @id @default(uuid())
+  type  FeedbackType
+  email String
+  message String
+  createdAt DateTime  @default(now())
+  projectId String
+  project Project @relation(fields: [projectId], references: [id], onDelete: Restrict)
 
   @@index([projectId])
 }
