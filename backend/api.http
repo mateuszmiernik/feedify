@@ -209,3 +209,37 @@ Content-Type: application/json
 }
 ```
 
+```http
+### Feedback: poprawny klucz i dane → 201
+# @prompt feedbackApiKey Paste the project API key (do not commit it)
+POST {{baseUrl}}/feedback
+Content-Type: application/json
+X-API-Key: {{feedbackApiKey}}
+
+{
+  "type": "bug",
+  "email": "  anna@example.com  ",
+  "message": "  Przycisk Kup teraz w koszyku nie reaguje.  "
+}
+
+### Feedback: brak klucza → 401
+POST {{baseUrl}}/feedback
+Content-Type: application/json
+
+{
+  "type": "bug",
+  "email": "anna@example.com",
+  "message": "Nie powinno zostać zapisane."
+}
+
+### Feedback: błędny format klucza → 401
+POST {{baseUrl}}/feedback
+Content-Type: application/json
+X-API-Key: to-nie-jest-klucz
+
+{
+  "type": "bug",
+  "email": "anna@example.com",
+  "message": "Nie powinno zostać zapisane."
+}
+```
