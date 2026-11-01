@@ -22,6 +22,8 @@ export async function requireApiKey(req: Request, res: Response, next: NextFunct
             res.status(401).json({ message: 'Missing or invalid API key.'});
             return;
         }
+
+        req.feedbackProjectId = storedKey.projectId;
     } catch {
         res.status(500).json({ message: 'Could not verify API key'});
         return;
